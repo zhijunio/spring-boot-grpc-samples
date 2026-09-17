@@ -30,14 +30,6 @@ grpcurl --plaintext \
   localhost:9090 com.example.HelloService/SayHello
 ```
 
-```bash
-grpcurl --plaintext localhost:9090 list
-grpcurl --plaintext \
-  -H 'authorization: Basic dXNlcjpwYXNzd29yZA==' \
-  -d '{"greeting":"John Doe"}' \
-  localhost:9090 com.example.HelloService/SayHello
-```
-
 走客户端：
 
 ```bash
@@ -45,11 +37,11 @@ curl -s "http://localhost:8082?greeting=John%20Doe"
 curl -s "http://localhost:8082/lots-of-replies?greeting=John%20Doe"
 ```
 
-测试：
+## 测试
 
 ```bash
 cd grpc-server && ./mvnw test
 cd grpc-client && ./mvnw test
 ```
 
-服务端测试用 `@AutoConfigureTestGrpcTransport`（进程内，不占 9090）。Initializr 带的 `*ApplicationTests` 会起 Netty，和本机已占用的 9090 冲突，已不保留。
+服务端测试走进程内通道，**不关 Security**：带 Basic 的调用应成功，不带凭证应拿到 `UNAUTHENTICATED`。Initializr 带的 `*ApplicationTests` 会起 Netty 占 9090，已不保留。
