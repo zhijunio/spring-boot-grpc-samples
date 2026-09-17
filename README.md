@@ -2,7 +2,7 @@
 
 [Spring Boot 4.1.1](https://docs.spring.io/spring-boot/reference/io/grpc.html) 的 gRPC 示例：Netty 服务端默认 **9090**，客户端用 MVC 包一层 HTTP。配套笔记：[Spring Boot 4 接入 gRPC](https://blog.zhijun.io/posts/spring-boot-grpc)。
 
-仓库：<https://github.com/zhijunio/spring-boot-grpc-samples>。只覆盖默认 Netty 路径，不含 Reactor、Native、安全、Servlet 同端口。
+仓库：<https://github.com/zhijunio/spring-boot-grpc-samples>。本分支给服务端加了 HTTP Basic（`user` / `password`），客户端通道会带上同样的凭证。不含 Reactor、Native、Servlet 同端口。
 
 | 模块 | 作用 | 端口 |
 |------|------|------|
@@ -20,11 +20,22 @@ cd grpc-server && ./mvnw spring-boot:run
 cd grpc-client && ./mvnw spring-boot:run
 ```
 
-直连服务端（需 [grpcurl](https://github.com/fullstorydev/grpcurl)）：
+直连服务端（需 [grpcurl](https://github.com/fullstorydev/grpcurl)）。业务方法要带 Basic（`user:password`）：
 
 ```bash
 grpcurl --plaintext localhost:9090 list
-grpcurl -d '{"greeting":"John Doe"}' --plaintext localhost:9090 com.example.HelloService/SayHello
+grpcurl --plaintext \
+  -H 'authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -d '{"greeting":"John Doe"}' \
+  localhost:9090 com.example.HelloService/SayHello
+```
+
+```bash
+grpcurl --plaintext localhost:9090 list
+grpcurl --plaintext \
+  -H 'authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -d '{"greeting":"John Doe"}' \
+  localhost:9090 com.example.HelloService/SayHello
 ```
 
 走客户端：
